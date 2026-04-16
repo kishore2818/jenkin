@@ -44,7 +44,7 @@ pipeline {
                 // Demonstration of a deployment command
                 script {
                     echo 'Deployment logic goes here (e.g., docker push, cloud foundry, etc.)'
-                    echo 'Application is live at: http://localhost:8080'
+                    echo 'Application is live at: http://localhost:9090'
                 }
             }
         }
