@@ -8,6 +8,6 @@ public class GreetingController {
 
     @GetMapping("/")
     public String hello() {
-        return "<h1>Hello World!</h1><p>This is a fully automated deployment from Jenkins.</p>";
+        return "<h1>Hello World!</h1><p>This is vedapu pathan.</p>";
     }
 }
