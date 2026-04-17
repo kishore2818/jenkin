@@ -38,21 +38,30 @@ pipeline {
             steps {
                 echo 'Deploying application to local environment...'
                 sh '''
+                # This prevents Jenkins from killing the background process
+                export JENKINS_NODE_COOKIE=dontKillMe
+
                 # 1. Stop any old version of the app running on port 9090
                 echo "Stopping old app if running..."
                 lsof -ti:9090 | xargs kill -9 || true
 
                 # 2. Find the newly built JAR file
-                JAR=$(ls build/libs/*.jar | head -n 1)
+                JAR=$(ls build/libs/*.jar | grep -v plain | head -n 1)
                 echo "Found JAR: $JAR"
 
                 # 3. Start the app in the background using nohup
                 echo "Starting app on port 9090..."
                 nohup java -jar $JAR > app.log 2>&1 &
                 
-                # 4. Give it a moment to start
-                sleep 5
-                echo "Deployment complete! Check http://localhost:9090"
+                # 4. Give it a moment to start and check if it stayed up
+                sleep 10
+                if lsof -Pi :9090 -sTCP:LISTEN -t >/dev/null ; then
+                    echo "Deployment complete! App is listening on port 9090."
+                else
+                    echo "ERROR: App failed to start. Check app.log inside the Jenkins workspace."
+                    cat app.log || true
+                    exit 1
+                fi
                 '''
             }
         }
